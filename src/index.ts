@@ -14,6 +14,22 @@
  *
  * Learn more at https://developers.cloudflare.com/workers/
  */
+import puppeteer from "@cloudflare/puppeteer";
+import { resources } from "./resources";
+import { headers } from "next/headers";
+
+interface Env {
+	MY_BROWSER: any;
+	ATPROTO_DOCS: R2Bucket;
+}
+
+async function pullContent(browser:any, url:string) {
+	const page = await browser.newPage();
+	await page.goto(url);
+	const content = await page.content();
+	await page.close();
+	return content;
+}
 
 export default {
 	async fetch(req) {
@@ -26,15 +42,25 @@ export default {
 	// The scheduled handler is invoked at the interval set in our wrangler.jsonc's
 	// [[triggers]] configuration.
 	async scheduled(event, env, ctx): Promise<void> {
+
+		const browser = await puppeteer.launch(env.MY_BROWSER);
+
+		for (const url of resources) {
+			const content = await pullContent(browser, url as string);
+			const key = url + "_" + Date.now() + ".html";
+			await env.ATPROTO_DOCS.put(key, content);
+		}
+		await browser.close();
+		console.log(`${event.cron}: success`);
 		// A Cron Trigger can make requests to other endpoints on the Internet,
 		// publish to a Queue, query a D1 Database, and much more.
 		//
 		// We'll keep it simple and make an API call to a Cloudflare API:
-		let resp = await fetch('https://api.cloudflare.com/client/v4/ips');
-		let wasSuccessful = resp.ok ? 'success' : 'fail';
+		// let resp = await fetch('https://api.cloudflare.com/client/v4/ips');
+		// let wasSuccessful = resp.ok ? 'success' : 'fail';
 
 		// You could store this result in KV, write to a D1 Database, or publish to a Queue.
 		// In this template, we'll just log the result:
-		console.log(`trigger fired at ${event.cron}: ${wasSuccessful}`);
+		// console.log(`trigger fired at ${event.cron}: ${wasSuccessful}`);
 	},
 } satisfies ExportedHandler<Env>;
