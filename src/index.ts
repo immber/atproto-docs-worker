@@ -11,8 +11,9 @@ async function pullAndSaveContent(browser:any, url:string, env:Env) {
 	const page = await browser.newPage();
 	await page.goto(url, {waitUntil: "load"});
 	//save it
+	const key = url + ".html";
 	const content = await page.content();
-	await env.ATPROTO_DOCS.put(url, content);
+	await env.ATPROTO_DOCS.put(key, content);
 
 	// now recursivly find path links and crawl them
 	const hrefs = await page.$$eval("a", (links:Array<any>) => {

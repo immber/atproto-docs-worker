@@ -24,6 +24,7 @@
 		{
 		"binding": "ATPROTO_DOCS",
 		"bucket_name": "atproto-docs",
+		"preview_bucket_name": "staging"
 		},
 	],
 	/**
