@@ -10,15 +10,15 @@ dependencies:
     version: 1.0.2
 
 devDependencies:
-  '@cloudflare/workers-types':
-    specifier: ^4.20250507.0
-    version: 4.20250508.0
+  '@types/node':
+    specifier: ^22.15.17
+    version: 22.15.17
   typescript:
     specifier: ^5.5.2
     version: 5.8.3
   wrangler:
     specifier: ^4.14.3
-    version: 4.14.4(@cloudflare/workers-types@4.20250508.0)
+    version: 4.14.4
 
 packages:
 
@@ -101,10 +101,6 @@ packages:
     requiresBuild: true
     dev: true
     optional: true
-
-  /@cloudflare/workers-types@4.20250508.0:
-    resolution: {integrity: sha512-Gr7NLsHy5BFXbWVMMO+1mf/DwxT30tNw5LGhC86S+CXErM2a2eJ0HJHqgAs0Y8Lt/XEUSrH9QrUFDvJWNhE4Rg==}
-    dev: true
 
   /@cspotcode/source-map-support@0.8.1:
     resolution: {integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==}
@@ -574,8 +570,6 @@ packages:
     requiresBuild: true
     dependencies:
       undici-types: 6.21.0
-    dev: false
-    optional: true
 
   /@types/yauzl@2.10.3:
     resolution: {integrity: sha512-oJoftv0LSuaDZE3Le4DbKX+KS9G36NzOeSap90UIK0yMA/NhKJhqlSGtNDORNRaIbQfzjXDrQa0ytJ6mNRGz/Q==}
@@ -1306,8 +1300,6 @@ packages:
   /undici-types@6.21.0:
     resolution: {integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==}
     requiresBuild: true
-    dev: false
-    optional: true
 
   /undici@5.29.0:
     resolution: {integrity: sha512-raqeBD6NQK4SkWhQzeYKd1KmIG6dllBOTt55Rmkt4HtI9mwdWtJljnrXjAFUBLTSN67HWrOIZ3EPF4kjUw80Bg==}
@@ -1339,7 +1331,7 @@ packages:
       '@cloudflare/workerd-windows-64': 1.20250507.0
     dev: true
 
-  /wrangler@4.14.4(@cloudflare/workers-types@4.20250508.0):
+  /wrangler@4.14.4:
     resolution: {integrity: sha512-HIdOdiMIcJV5ymw80RKsr3Uzen/p1kRX4jnCEmR2XVeoEhV2Qw6GABxS5WMTlSES2/vEX0Y+ezUAdsprcUhJ5g==}
     engines: {node: '>=18.0.0'}
     hasBin: true
@@ -1351,7 +1343,6 @@ packages:
     dependencies:
       '@cloudflare/kv-asset-handler': 0.4.0
       '@cloudflare/unenv-preset': 2.3.1(unenv@2.0.0-rc.15)(workerd@1.20250507.0)
-      '@cloudflare/workers-types': 4.20250508.0
       blake3-wasm: 2.1.5
       esbuild: 0.25.4
       miniflare: 4.20250507.0
