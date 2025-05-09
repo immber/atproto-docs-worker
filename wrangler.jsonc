@@ -12,7 +12,7 @@
 	},
 	"triggers": {
 		"crons": [
-			"0 4 * * 6" //runs at 04:00 on Saturdays
+			"0 10 * * 6" //runs at 03:00 PDT on Fridays
 		]
 	},
 
