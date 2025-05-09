@@ -21,7 +21,7 @@ This worker fees the vecotorize index used by [mcp-atproto-docs](https://github.
 https://mcp-atproto-docs.immber.workers.dev/sse
 ```
 
-You can use the `search_documentatin` tool to query ATprocol's public documentation.
+You can use the `search_documentation` tool to query ATprocol's public documentation.
 
 For usage instructions see https://github.com/immber/mcp-atproto-docs
 
