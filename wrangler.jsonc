@@ -12,7 +12,7 @@
 	},
 	"triggers": {
 		"crons": [
-			"0 10 * * 6" //runs at 03:00 PDT on Fridays
+			"0 16 * * 1"
 		]
 	},
 
@@ -27,6 +27,21 @@
 		"preview_bucket_name": "staging"
 		},
 	],
+	"queues": {
+		"consumers": [
+			{
+				"queue": "queue-atproto-docs-worker",
+				"max_batch_timeout": 60
+			}
+		],
+		"producers": [
+			{
+				"queue": "queue-atproto-docs-worker",
+				"binding": "CRAWLER_QUEUE"
+			}
+
+		]
+	}
 	/**
 	 * Smart Placement
 	 * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement

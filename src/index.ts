@@ -1,12 +1,44 @@
 import puppeteer from "@cloudflare/puppeteer";
 import { resources } from "./resources";
 
+import type { Browser } from "@cloudflare/puppeteer";
+
 interface Env {
 	MY_BROWSER: any;
+	CRAWLER_QUEUE: Queue<Message>;
 	ATPROTO_DOCS: R2Bucket;
 }
-//TODO: should this be a queue, yep, but for now its just this
-async function pullAndSaveContent(browser:any, url:string, env:Env) {
+
+type Message = {
+	url: string;
+  };
+
+async function enqueueMessage(msg:Message, env:Env) {
+	await env.CRAWLER_QUEUE.send(msg);
+}
+
+async function queueHandler(batch: MessageBatch<Message>, env: Env): Promise<void> {
+	let browser: Browser | null = null;
+	try {
+		browser = await puppeteer.launch(env.MY_BROWSER);
+	} catch {
+		batch.retryAll();
+		return;
+	}
+	for (const message of batch.messages) {
+		try {
+			const url = message.body.url;
+			await crawlAndSaveContent(browser, url, env);
+			message.ack();
+		} catch {
+			message.retry();
+		}
+	}
+	await browser.close();
+}
+
+// crawls a single url at a time and saves content to R2
+async function crawlAndSaveContent(browser:any, url:string, env:Env) {
 	//pull content
 	const page = await browser.newPage();
 	await page.goto(url, {waitUntil: "load"});
@@ -14,8 +46,9 @@ async function pullAndSaveContent(browser:any, url:string, env:Env) {
 	const key = url + ".html";
 	const content = await page.content();
 	await env.ATPROTO_DOCS.put(key, content);
+	console.log(`saved ${key}`);
 
-	// now recursivly find path links and crawl them
+	// now find path links and queue them
 	const hrefs = await page.$$eval("a", (links:Array<any>) => {
 		return links.map(link => link.href)
 		});
@@ -27,9 +60,16 @@ async function pullAndSaveContent(browser:any, url:string, env:Env) {
 			paths.push(href);
 		}
 	}
-	for (const path of paths) {
-		await pullAndSaveContent(browser, path, env);
-	}
+	const urls: MessageSendRequest<Message>[] = paths.map((path) => {
+		return {
+		  body: {
+			url: path,
+		  },
+		};
+	});
+	try {
+		await env.CRAWLER_QUEUE.sendBatch(urls);
+	} catch {}
 	await page.close();
 	return ;
 }
@@ -46,22 +86,16 @@ export default {
 	// [[triggers]] configuration.
 	async scheduled(event, env, ctx): Promise<void> {
 
-		const browser = await puppeteer.launch(env.MY_BROWSER);
-
 		for (const url of resources) {
-			await pullAndSaveContent(browser, url as string, env);
+			//list of links enters queue for crawling
+			await enqueueMessage({url:url}, env);
 		}
-		await browser.close();
-		console.log(`success`);
-		// A Cron Trigger can make requests to other endpoints on the Internet,
-		// publish to a Queue, query a D1 Database, and much more.
-		//
-		// We'll keep it simple and make an API call to a Cloudflare API:
-		// let resp = await fetch('https://api.cloudflare.com/client/v4/ips');
-		// let wasSuccessful = resp.ok ? 'success' : 'fail';
-
-		// You could store this result in KV, write to a D1 Database, or publish to a Queue.
-		// In this template, we'll just log the result:
-		// console.log(`trigger fired at ${event.cron}: ${wasSuccessful}`);
+		console.log(`queued ${resources.length} resources`);
 	},
+
+	// consume the queue with the urls to crawl
+	async queue(batch: MessageBatch<any>, env: Env): Promise<void> {
+		await queueHandler(batch, env);
+	}
+
 } satisfies ExportedHandler<Env>;
