@@ -16,7 +16,7 @@ Learn more at https://developers.cloudflare.com/workers/
 
 ## MCP server for atproto docs
 
-This worker fees the vecotorize index used by [mcp-atproto-docs](https://github.com/immber/mcp-atproto-docs) a remote MCP server publicly available at:
+This worker feeds the vecotorize index used by [mcp-atproto-docs](https://github.com/immber/mcp-atproto-docs) a remote MCP server publicly available at:
 ```
 https://mcp-atproto-docs.immber.workers.dev/sse
 ```
