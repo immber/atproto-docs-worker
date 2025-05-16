@@ -1,5 +1,5 @@
 export const resources = [
     "https://atproto.com/",
-	"https://atproto.wiki/en/home",
+	"https://atproto.wiki/",
 	"https://docs.bsky.app/"
 ];
